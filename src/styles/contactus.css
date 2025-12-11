@@ -1,0 +1,36 @@
+.contactus-container {
+  height: 100vh;
+  padding: 50px;
+  color: black;
+  background-image: url('/public/images/dashboard-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  backdrop-filter: blur(6px);
+  
+}
+
+.contactus-container h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: black;
+  
+
+}
+
+.contactus-container p {
+  font-size: 18px;
+  line-height: 1.6;
+  max-width: 800px;
+  text-align: center;
+  color: black;
+  font-weight: bold;
+  align-items: center;
+  
+  
+  
+  
+ 
+  
+
+}
