@@ -1,42 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/users.css";
 import { getUsers, addUser, deleteUser } from "../apiService";
 
 const UsersPage = () => {
-  const [users, setUsers] = useState([
-    { id: 1, name: "Jones", email: "jones@example.com" },
-    { id: 2, name: "Vincy", email: "vincy@example.com" },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
 
-  // Add user
-  const handleAddUser = () => {
-    if (newUserName && newUserEmail) {
-      const newUser = {
-        id: users.length + 1,
-        name: newUserName,
-        email: newUserEmail,
-      };
-      setUsers([...users, newUser]);
-      setNewUserName("");
-      setNewUserEmail("");
-    } else {
-      alert("Please enter name and email");
+  // Load all users when page opens
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await getUsers();
+      setUsers(response.data.data); // from backend: {message, data}
+    } catch (error) {
+      console.error("Error fetching users:", error);
     }
   };
 
-  // Delete user
-  const handleDeleteUser = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
+  // Add user to backend
+  const handleAddUser = async () => {
+    if (!newUserName || !newUserEmail) {
+      alert("Please enter name and email");
+      return;
+    }
+
+    try {
+      const newUser = { name: newUserName, email: newUserEmail };
+      await addUser(newUser);
+
+      setNewUserName("");
+      setNewUserEmail("");
+      fetchUsers(); // refresh table
+    } catch (error) {
+      console.error("Error adding user:", error);
+    }
+  };
+
+  // Delete user from backend
+  const handleDeleteUser = async (id) => {
+    try {
+      await deleteUser(id);
+      fetchUsers(); // refresh table
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
   };
 
   return (
     <div className="users-page-container">
       <h1>Users Management</h1>
 
-      {/* Add User Form */}
       <div className="add-user-form">
         <input
           type="text"
@@ -53,7 +70,6 @@ const UsersPage = () => {
         <button onClick={handleAddUser}>Add User</button>
       </div>
 
-      {/* Users Table */}
       <table className="users-table">
         <thead>
           <tr>
@@ -65,14 +81,14 @@ const UsersPage = () => {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
+            <tr key={user._id}>
+              <td>{user._id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
               <td>
                 <button
                   className="delete-btn"
-                  onClick={() => handleDeleteUser(user.id)}
+                  onClick={() => handleDeleteUser(user._id)}
                 >
                   Delete
                 </button>
@@ -86,4 +102,3 @@ const UsersPage = () => {
 };
 
 export default UsersPage;
-
